@@ -1,50 +1,49 @@
 <script>
-  import * as d3 from "d3"
-  import {onMount} from "svelte"
+  import * as d3 from "d3";
+  import { onMount } from "svelte";
   import Scrolly from "./components/Scrolly.svelte";
-	let value;
+  let value;
 
-  /* Array donde guardaremos la data */
-  let deportistas = []
+  let deportistas = [];
+  let filteredDeportistas = [];
 
-  /* 1. Escala para edades */
-  let grosor = d3.scaleLinear().range([5, 20])
-
-  /* 2. Escala para genero */
-  let colorGenero = d3
-    .scaleOrdinal()
-    .domain(["F", "M"])
-    .range(["#ffc0cb", "#c0f9ff"])
-
-  /* 3. Escala para continentes */
-  let colorContinentes = d3
-    .scaleOrdinal()
-    .domain(["América", "África", "Asia", "Europa", "Oceanía"])
-    .range(["#ed334e", "#000000", "#fbb132", "#009fe3", "#00963f"])
-
-  /* 4. Escala para altura */
-  let radioAltura = d3.scaleRadial()
-
-  /* 5. Escala para medallas */
-  let colorMedalla = d3.scaleOrdinal()
-    .domain(["Oro", "Plata", "Bronce"])
-    .range(["gold", "silver", "brown"])
+  let grosor = d3.scaleLinear().range([5, 20]);
+  let colorGenero = d3.scaleOrdinal().domain(["F", "M"]).range(["#ffc0cb", "#c0f9ff"]);
+  let colorContinentes = d3.scaleOrdinal().domain(["América", "África", "Asia", "Europa", "Oceanía"]).range(["#ed334e", "#000000", "#fbb132", "#009fe3", "#00963f"]);
+  let radioAltura = d3.scaleRadial();
+  let colorMedalla = d3.scaleOrdinal().domain(["Oro", "Plata", "Bronce"]).range(["gold", "silver", "brown"]);
 
   onMount(() => {
-    d3.csv("./data/deportistas.csv", d3.autoType).then(data => {
-      console.log(data)
+    d3.csv("./data/deportistas.csv", d3.autoType).then((data) => {
+      let minMaxEdad = d3.extent(data, (d) => d.edad);
+      grosor = grosor.domain(minMaxEdad);
 
-      /* Actualizamos dominio con la data de edad */
-      let minMaxEdad = d3.extent(data, d => d.edad)
-      grosor = grosor.domain(minMaxEdad)
+      let minMaxAltura = d3.extent(data, (d) => d.altura);
+      radioAltura = radioAltura.domain(minMaxAltura).range([25, 50]);
 
-      /* Actualizamos dominio y rango con la data de altura */
-      let minMaxAltura = d3.extent(data, d => d.altura)
-      radioAltura = radioAltura.domain(minMaxAltura).range([25, 50])
+      deportistas = data;
+      filteredDeportistas = data;
+    });
+  });
 
-      deportistas = data
-    })
-  })
+  $: handleScroll(value);
+
+  function handleScroll(index) {
+    switch (index) {
+      case 0:
+        filteredDeportistas = deportistas;
+        break;
+      case 1:
+        filteredDeportistas = deportistas.filter(d => d.genero === "F");
+        break;
+      case 2:
+        filteredDeportistas = deportistas.filter(d => d.genero === "M");
+        break;
+      // Add more cases for different filters as needed
+      default:
+        filteredDeportistas = deportistas;
+    }
+  }
 </script>
 
 <main>
@@ -56,47 +55,35 @@
     </h3>
     <p class="bajada">Explorando los logros olímpicos a través de datos</p>
   </div>
-
-  <!-- Conedor de las entidades -->
-  <div class="container">
-    <!-- Iteramos la data para visualizar c/ entidad -->
-    {#each deportistas as dep}
-      <div class="person-container">
-        <div class="medal"
-          style="background-color: {colorMedalla(dep.medalla)}"
-          ></div>
-        <div
-          class="person"
-          style="border-width: {grosor(dep.edad)}px; 
-        background-color:{colorGenero(dep.genero)}; 
-        width: {2 * radioAltura(dep.altura)}px; 
-        height: {2 * radioAltura(dep.altura)}px; 
-        border-color: {colorContinentes(dep.continente)}"
-        ></div>
-        <p class="name">
-          <b>{dep.nombre}</b>
-          <br />
-          {dep.continente}
-        </p>
-      </div>
-    {/each}
-  </div>
 </main>
 
 <section id="scrolly">
-	<h2>Scrolly <span>{value}</span></h2>
-	<div class="spacer" />
-	<Scrolly bind:value>
-		{#each [0, 1, 2, 3, 4] as text, i}
-			{@const active = value === i}
-			<div class="step" class:active>
-				<p>{text}</p>
-			</div>
-		{/each}
-	</Scrolly>
-	<div class="spacer" />
+  <h2>Scrolly <span>{value}</span></h2>
+  <div class="spacer"></div>
+  <Scrolly bind:value={value}>
+    {#each [0, 1, 2, 3, 4] as text, i}
+      {@const active = value === i}
+      <div class="step" class:active>
+        <p>{text}</p>
+        {#if active}
+          <div class="container">
+            {#each filteredDeportistas as dep}
+              <div class="person-container">
+                <div class="medal" style="background-color: {colorMedalla(dep.medalla)}"></div>
+                <div class="person" style="border-width: {grosor(dep.edad)}px; background-color: {colorGenero(dep.genero)}; width: {2 * radioAltura(dep.altura)}px; height: {2 * radioAltura(dep.altura)}px; border-color: {colorContinentes(dep.continente)}"></div>
+                <p class="name">
+                  <b>{dep.nombre}</b><br />
+                  {dep.continente}
+                </p>
+              </div>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    {/each}
+  </Scrolly>
+  <div class="spacer"></div>
 </section>
-
 
 <style>
   .header {
@@ -162,23 +149,22 @@
     text-align: center;
     margin-top: 5px;
   }
-
   h2 {
-		position: sticky;
-		top: 4em;
-	}
-
-	.spacer {
-		height: 75vh;
-	}
-
-	.step {
-		height: 80vh;
-		background: var(--color-gray-100);
-		text-align: center;
-	}
-
-	.step p {
-		padding: 1rem;
-	}
+    position: sticky;
+    top: 4em;
+  }
+  .spacer {
+    height: 75vh;
+  }
+  .step {
+    height: 80vh;
+    background: var(--color-gray-100);
+    text-align: center;
+  }
+  .step p {
+    padding: 1rem;
+  }
+  .active {
+    background-color: red;
+  }
 </style>

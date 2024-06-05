@@ -1,4 +1,4 @@
-# VD | Scrollytelling con Dataviz Creativa
+# VD | Svelte Scroller Template 
 
 ### Maqueta de proyecto que implementa svelte-scroller para filtrar datos y mostrar visualizaciones de datos en una página web con efecto de scrollytelling.
 ---

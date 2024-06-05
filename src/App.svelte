@@ -11,7 +11,7 @@
   let deportistas = []
   let filteredDeportistas = []
 
-  /* Variables para el scroller */
+  /* Variables para el scroller1 */
   let count
   let index
   let offset
@@ -19,6 +19,22 @@
   let top = 0.1
   let threshold = 0.5
   let bottom = 0.9
+
+  /* Variables para el scroller 2 */
+  let count2
+  let index2
+  let offset2
+  let progress2
+  let top2 = 0.1
+  let threshold2 = 0.5
+  let bottom2 = 0.9
+
+  /* Charts */
+  let charts = {
+    0: "lines_01.png",
+    1: "lines_02.png",
+    2: "lines_03.png",
+  }
 
   onMount(() => {
     d3.csv("./data/deportistas.csv", d3.autoType).then(data => {
@@ -40,7 +56,9 @@
         filteredDeportistas = deportistas.filter(d => d.genero === "M")
         break
       case 3:
-        filteredDeportistas = deportistas.filter(d => d.continente === "América")
+        filteredDeportistas = deportistas.filter(
+          d => d.continente === "América",
+        )
         break
       default:
         filteredDeportistas = deportistas
@@ -60,16 +78,17 @@
     <div class="lorem_ipsum">
       <Loremipsum />
     </div>
-    
   </div>
 
+  {#if progress < 1}
   <DebugScroller
     index={index}
     count={count}
     offset={offset}
     progress={progress}
   />
-
+  {/if}
+  <!-- Primer scroller -->
   <Scroller
     top={top}
     threshold={threshold}
@@ -82,7 +101,6 @@
     <div slot="background">
       <Medallero deportistas={filteredDeportistas} />
     </div>
-
     <div slot="foreground" class="foreground_container">
       <section class="step_foreground">
         <div class="epi_foreground">
@@ -110,6 +128,47 @@
       </section>
     </div>
   </Scroller>
+
+  <div class="lorem_ipsum">
+    <Loremipsum />
+  </div>
+  
+
+  <!-- Segundo scroller -->
+  <Scroller
+    top={top2}
+    threshold={threshold2}
+    bottom={bottom2}
+    bind:count={count2}
+    bind:index={index2}
+    bind:offset={offset2}
+    bind:progress={progress2}
+  >
+    <div slot="background" class="image_container">
+      <img src="/images/{charts[index2]}" alt="chart {index2}" class="charts"
+      />
+    </div>
+    <div slot="foreground" class="foreground_container">
+      <section class="step_foreground">
+        <div class="epi_foreground">
+          <h3>Seccion {index2 + 1}</h3>
+          <p>Gráfico 1</p>
+        </div>
+      </section>
+      <section class="step_foreground">
+        <div class="epi_foreground">
+          <h3>Seccion {index2 + 1}</h3>
+          <p>Gráfico 1</p>
+        </div>
+      </section>
+      <section class="step_foreground">
+        <div class="epi_foreground">
+          <h3>Seccion {index2 + 1}</h3>
+          <p>Gráfico 1</p>
+        </div>
+      </section>
+    </div>
+  </Scroller>
 </main>
 
 <div class="lorem_ipsum">
@@ -117,6 +176,7 @@
 </div>
 
 <style>
+
   .header {
     display: flex;
     justify-content: center;
@@ -167,7 +227,10 @@
     margin: 100px auto;
     max-width: 740px;
   }
-  :global(svelte-scroller-background-container) {
-    transform: translate(0px, 0) !important
+  .image_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
   }
 </style>

@@ -1,48 +1,51 @@
 <script>
-  import * as d3 from "d3";
-  import { onMount } from "svelte";
-  import Scrolly from "./components/Scrolly.svelte";
-  let value;
+  import Scroller from "@sveltejs/svelte-scroller"
+  import {onMount} from "svelte"
+  import * as d3 from "d3"
 
-  let deportistas = [];
-  let filteredDeportistas = [];
+  import Medallero from "./components/Medallero.svelte"
+  import DebugScroller from "./components/DebugScroller.svelte"
+  import Loremipsum from "./components/Loremipsum.svelte"
 
-  let grosor = d3.scaleLinear().range([5, 20]);
-  let colorGenero = d3.scaleOrdinal().domain(["F", "M"]).range(["#ffc0cb", "#c0f9ff"]);
-  let colorContinentes = d3.scaleOrdinal().domain(["América", "África", "Asia", "Europa", "Oceanía"]).range(["#ed334e", "#000000", "#fbb132", "#009fe3", "#00963f"]);
-  let radioAltura = d3.scaleRadial();
-  let colorMedalla = d3.scaleOrdinal().domain(["Oro", "Plata", "Bronce"]).range(["gold", "silver", "brown"]);
+  /* Variables para la data del medallero */
+  let deportistas = []
+  let filteredDeportistas = []
+
+  /* Variables para el scroller */
+  let count
+  let index
+  let offset
+  let progress
+  let top = 0.1
+  let threshold = 0.5
+  let bottom = 0.9
 
   onMount(() => {
-    d3.csv("./data/deportistas.csv", d3.autoType).then((data) => {
-      let minMaxEdad = d3.extent(data, (d) => d.edad);
-      grosor = grosor.domain(minMaxEdad);
+    d3.csv("./data/deportistas.csv", d3.autoType).then(data => {
+      deportistas = data
+      filteredDeportistas = deportistas
+    })
+  })
 
-      let minMaxAltura = d3.extent(data, (d) => d.altura);
-      radioAltura = radioAltura.domain(minMaxAltura).range([25, 50]);
-
-      deportistas = data;
-      filteredDeportistas = data;
-    });
-  });
-
-  $: handleScroll(value);
-
-  function handleScroll(index) {
+  $: {
+    // Es un observer que se ejecuta cuando cambia el valor de index
     switch (index) {
       case 0:
-        filteredDeportistas = deportistas;
-        break;
+        filteredDeportistas = deportistas
+        break
       case 1:
-        filteredDeportistas = deportistas.filter(d => d.genero === "F");
-        break;
+        filteredDeportistas = deportistas.filter(d => d.genero === "F")
+        break
       case 2:
-        filteredDeportistas = deportistas.filter(d => d.genero === "M");
-        break;
-      // Add more cases for different filters as needed
+        filteredDeportistas = deportistas.filter(d => d.genero === "M")
+        break
+      case 3:
+        filteredDeportistas = deportistas.filter(d => d.continente === "América")
+        break
       default:
-        filteredDeportistas = deportistas;
+        filteredDeportistas = deportistas
     }
+    console.log(filteredDeportistas)
   }
 </script>
 
@@ -54,36 +57,64 @@
       Medallas, alturas y continentes
     </h3>
     <p class="bajada">Explorando los logros olímpicos a través de datos</p>
+    <div class="lorem_ipsum">
+      <Loremipsum />
+    </div>
+    
   </div>
+
+  <DebugScroller
+    index={index}
+    count={count}
+    offset={offset}
+    progress={progress}
+  />
+
+  <Scroller
+    top={top}
+    threshold={threshold}
+    bottom={bottom}
+    bind:count={count}
+    bind:index={index}
+    bind:offset={offset}
+    bind:progress={progress}
+  >
+    <div slot="background">
+      <Medallero deportistas={filteredDeportistas} />
+    </div>
+
+    <div slot="foreground" style="padding: 0 0 0 50%;">
+      <section>
+        <div class="epi_foreground">
+          <h3>Seccion {index + 1}</h3>
+          <p>Todos los deportistas</p>
+        </div>
+      </section>
+      <section>
+        <div class="epi_foreground">
+          <h3>Seccion {index + 1}</h3>
+          <p>Deportistas femeninas</p>
+        </div>
+      </section>
+      <section>
+        <div class="epi_foreground">
+          <h3>Seccion {index + 1}</h3>
+          <p>Deportistas masculinos</p>
+        </div>
+      </section>
+      <section>
+        <div class="epi_foreground">
+          <h3>Seccion {index + 1}</h3>
+          <p>Deportistas americanos</p>
+        </div>
+      </section>
+    </div>
+  </Scroller>
 </main>
 
-<section id="scrolly">
-  <h2>Scrolly <span>{value}</span></h2>
-  <div class="spacer"></div>
-  <Scrolly bind:value={value}>
-    {#each [0, 1, 2, 3, 4] as text, i}
-      {@const active = value === i}
-      <div class="step" class:active>
-        <p>{text}</p>
-        {#if active}
-          <div class="container">
-            {#each filteredDeportistas as dep}
-              <div class="person-container">
-                <div class="medal" style="background-color: {colorMedalla(dep.medalla)}"></div>
-                <div class="person" style="border-width: {grosor(dep.edad)}px; background-color: {colorGenero(dep.genero)}; width: {2 * radioAltura(dep.altura)}px; height: {2 * radioAltura(dep.altura)}px; border-color: {colorContinentes(dep.continente)}"></div>
-                <p class="name">
-                  <b>{dep.nombre}</b><br />
-                  {dep.continente}
-                </p>
-              </div>
-            {/each}
-          </div>
-        {/if}
-      </div>
-    {/each}
-  </Scrolly>
-  <div class="spacer"></div>
-</section>
+<div class="lorem_ipsum">
+  <Loremipsum />
+</div>
 
 <style>
   .header {
@@ -110,61 +141,42 @@
   .headline b {
     display: block;
   }
-  .container {
-    display: flex;
-    justify-content: center;
-    align-items: end;
-    margin: auto;
-    flex-wrap: wrap;
-    max-width: 1000px;
-    gap: 30px;
-    margin-bottom: 100px;
+
+  /* Estilos para el scroller */
+  [slot="background"] {
+    /* background-color: rgba(255, 62, 0, 0.05);
+    border-top: 2px solid #ff3e00;
+    border-bottom: 2px solid #ff3e00; */
+    font-size: 1.4em;
+    /* overflow: hidden; */
+    padding: 1em;
   }
-  .person-container {
+
+  [slot="foreground"] {
+    pointer-events: none;
+  }
+
+  [slot="foreground"] section {
+    pointer-events: all;
+  }
+
+  section {
     display: flex;
-    justify-content: center;
-    flex-direction: column;
+    justify-content: end;
     align-items: center;
-    flex: 180px 0 0;
+    height: 100vh;
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    color: white;
+    padding: 1em;
+    margin: 0 0 2em 0;
   }
-  .person {
-    width: 100px;
-    height: 100px;
-    border: 10px solid black;
-    border-radius: 50%;
-    box-sizing: border-box;
-    background-color: pink;
+  .epi_foreground {
+    padding: 20px;
+    max-width: 150px;
+    background-color: rgba(0, 0, 0, 0.5);
   }
-  .medal {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background-color: gold;
-    margin: 5px 0;
-  }
-  .name {
-    font-size: 14px;
-    color: rgb(65, 65, 65);
-    font-weight: normal;
-    text-align: center;
-    margin-top: 5px;
-  }
-  h2 {
-    position: sticky;
-    top: 4em;
-  }
-  .spacer {
-    height: 75vh;
-  }
-  .step {
-    height: 80vh;
-    background: var(--color-gray-100);
-    text-align: center;
-  }
-  .step p {
-    padding: 1rem;
-  }
-  .active {
-    background-color: red;
+  .lorem_ipsum {
+    margin: 100px auto;
+    max-width: 740px;
   }
 </style>

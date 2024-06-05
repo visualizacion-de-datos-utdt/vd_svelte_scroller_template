@@ -83,26 +83,26 @@
       <Medallero deportistas={filteredDeportistas} />
     </div>
 
-    <div slot="foreground" style="padding: 0 0 0 50%;">
-      <section>
+    <div slot="foreground" class="foreground_container">
+      <section class="step_foreground">
         <div class="epi_foreground">
           <h3>Seccion {index + 1}</h3>
           <p>Todos los deportistas</p>
         </div>
       </section>
-      <section>
+      <section class="step_foreground">
         <div class="epi_foreground">
           <h3>Seccion {index + 1}</h3>
           <p>Deportistas femeninas</p>
         </div>
       </section>
-      <section>
+      <section class="step_foreground">
         <div class="epi_foreground">
           <h3>Seccion {index + 1}</h3>
           <p>Deportistas masculinos</p>
         </div>
       </section>
-      <section>
+      <section class="step_foreground">
         <div class="epi_foreground">
           <h3>Seccion {index + 1}</h3>
           <p>Deportistas americanos</p>
@@ -143,24 +143,12 @@
   }
 
   /* Estilos para el scroller */
-  [slot="background"] {
-    /* background-color: rgba(255, 62, 0, 0.05);
-    border-top: 2px solid #ff3e00;
-    border-bottom: 2px solid #ff3e00; */
-    font-size: 1.4em;
-    /* overflow: hidden; */
-    padding: 1em;
-  }
-
-  [slot="foreground"] {
+  .foreground_container {
     pointer-events: none;
+    padding-left: 50%;
   }
 
-  [slot="foreground"] section {
-    pointer-events: all;
-  }
-
-  section {
+  .step_foreground {
     display: flex;
     justify-content: end;
     align-items: center;
@@ -178,5 +166,8 @@
   .lorem_ipsum {
     margin: 100px auto;
     max-width: 740px;
+  }
+  :global(svelte-scroller-background-container) {
+    transform: translate(0px, 0) !important
   }
 </style>

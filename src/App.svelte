@@ -1,7 +1,9 @@
 <script>
   import Scroller from "@sveltejs/svelte-scroller"
-  import {onMount} from "svelte"
+  import { onMount } from "svelte"
   import * as d3 from "d3"
+  /* Importamos componente para video scroll */
+  import ScrollyVideo from "scrolly-video/dist/ScrollyVideo.svelte"
 
   import Medallero from "./components/Medallero.svelte"
   import DebugScroller from "./components/DebugScroller.svelte"
@@ -37,7 +39,7 @@
   }
 
   onMount(() => {
-    d3.csv("./data/deportistas.csv", d3.autoType).then(data => {
+    d3.csv("./data/deportistas.csv", d3.autoType).then((data) => {
       deportistas = data
       filteredDeportistas = deportistas
     })
@@ -50,14 +52,14 @@
         filteredDeportistas = deportistas
         break
       case 1:
-        filteredDeportistas = deportistas.filter(d => d.genero === "F")
+        filteredDeportistas = deportistas.filter((d) => d.genero === "F")
         break
       case 2:
-        filteredDeportistas = deportistas.filter(d => d.genero === "M")
+        filteredDeportistas = deportistas.filter((d) => d.genero === "M")
         break
       case 3:
         filteredDeportistas = deportistas.filter(
-          d => d.continente === "América",
+          (d) => d.continente === "América"
         )
         break
       default:
@@ -80,13 +82,15 @@
     </div>
   </div>
 
+  <ScrollyVideo src="https://scrollyvideo.js.org/goldengate.mp4" />
+
   {#if progress < 1}
-  <DebugScroller
-    index={index}
-    count={count}
-    offset={offset}
-    progress={progress}
-  />
+    <DebugScroller
+      index={index}
+      count={count}
+      offset={offset}
+      progress={progress}
+    />
   {/if}
   <!-- Primer scroller -->
   <Scroller
@@ -132,7 +136,6 @@
   <div class="lorem_ipsum">
     <Loremipsum />
   </div>
-  
 
   <!-- Segundo scroller -->
   <Scroller
@@ -145,8 +148,7 @@
     bind:progress={progress2}
   >
     <div slot="background" class="image_container">
-      <img src="/images/{charts[index2]}" alt="chart {index2}" class="charts"
-      />
+      <img src="/images/{charts[index2]}" alt="chart {index2}" class="charts" />
     </div>
     <div slot="foreground" class="foreground_container">
       <section class="step_foreground">
@@ -176,7 +178,6 @@
 </div>
 
 <style>
-
   .header {
     display: flex;
     justify-content: center;

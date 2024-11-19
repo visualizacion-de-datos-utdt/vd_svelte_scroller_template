@@ -1,12 +1,15 @@
-# VD | Svelte Scroller Template 
+# VD | Svelte Scroller Template
 
 ### Maqueta de proyecto que implementa svelte-scroller para filtrar datos y mostrar visualizaciones de datos en una página web con efecto de scrollytelling.
+
 ---
 
-### Referencias: 
-- [https://github.com/sveltejs/svelte-scroller](https://github.com/sveltejs/svelte-scroller)
+### Referencias:
+
+- [Svelte Scroller](https://github.com/sveltejs/svelte-scroller)
+- [Scrolly Video](https://github.com/dkaoster/scrolly-video?tab=readme-ov-file#-svelte)
 - [Escalas de d3.js](https://d3js.org/d3-scale)
-[API de Intersection Observer](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
+  [API de Intersection Observer](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
 
 ![thumbnail](thumbnail.png)
 

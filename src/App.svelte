@@ -82,7 +82,9 @@
     </div>
   </div>
 
-  <ScrollyVideo src="https://scrollyvideo.js.org/goldengate.mp4" />
+  <ScrollyVideo
+    src="https://www.reuters.com/graphics/OLYMPICS-2024/SURFING/akpeoxnyopr/cdn/videos/map.mp4"
+  />
 
   {#if progress < 1}
     <DebugScroller
